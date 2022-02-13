@@ -4,7 +4,6 @@
 #define TRUE 1
 #define FALSE 0
 
-
 struct data{
     int dia, mes, ano;
 };
@@ -59,7 +58,6 @@ void MostrarAlunosReverso(Aluno *first) // NOLINT(misc-no-recursion)
         }
         MostrarAlunosReverso(first->next);
         printf("%s, %s, %d/%d/%d, %.2f\n", first->matricula, first->nome, first->nascimento.dia,first->nascimento.mes, first->nascimento.ano, first->media);
-
 }
 Aluno *Inserir(Aluno *atual)
 {
@@ -88,12 +86,10 @@ Aluno *Inserir(Aluno *atual)
 Aluno *Excluir(Aluno *first,  const char *matricula)
 {
     Aluno *aux, *prev = first;
-    printf("%d zzz \n", NULL == first);
     for(aux = first; aux != NULL; aux = aux->next)
     {
         if(strcmp(aux->matricula, matricula) == 0)
         {
-            printf("entrou\n");
             if(aux == first)
             {
                 first = aux->next;
@@ -128,7 +124,6 @@ int main()
     Aluno *atual, *aux, *first = NULL;
     while(TRUE)
     {
-
         int opt;
         printf("(0) Sair\n(1) Adicionar\n(2) Excluir\n(3) Imprimir\n(4) Imprimir Reverso\n(5) Quantidade Elementos\n:");
         scanf("%d", &opt);
@@ -144,7 +139,6 @@ int main()
             {
                 first = atual;
                 aux = atual;
-
             }
             else
             {
@@ -153,22 +147,22 @@ int main()
             }
         }
         else if(opt == 2)
-        {   char matricula[10]; scanf("%s",matricula);
+        {if(!ListaVazia(first))
+        {
+            char matricula[10]; scanf("%s",matricula);
             first = Excluir(first,matricula);
+        }
         }
         else if(opt == 3)
         {
-            if(ListaVazia(first)){}
-            else
+            if(!ListaVazia(first))
             {
                 MostrarAlunos(first);
             }
-
         }
         else if(opt == 4)
         {
-            if(ListaVazia(first)){}
-            else
+            if(!ListaVazia(first))
             {
                 MostrarAlunosReverso(first);
             }
@@ -176,9 +170,7 @@ int main()
         else if(opt == 5)
         {
             printf("A lista tem %d elementos\n",QuantosElementos(first));
-
         }
     }
-
     return 0;
 }
