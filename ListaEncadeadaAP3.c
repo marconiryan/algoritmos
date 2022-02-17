@@ -5,7 +5,7 @@
 #define FALSE 0
 
 struct data{
-    int dia, mes, ano;
+    char data_nascimento[15];
 };
 typedef struct data Data;
 struct aluno{
@@ -32,9 +32,7 @@ int ListaVazia(Aluno *first)
 {
     if (!QuantosElementos(first))
     {
-        printf("----------------\n");
-        printf("Lista Vazia\n");
-        printf("----------------\n");
+        printf("Lista Vazia!\n");
         return TRUE;
     }
     return FALSE;
@@ -42,42 +40,36 @@ int ListaVazia(Aluno *first)
 
 void MostrarAlunos(Aluno *first)
 {
-        Aluno *aux;
-        for (aux = first; aux != NULL; aux = aux->next)
-        {
-            printf("%s, %s, %d/%d/%d, %.2f\n", aux->matricula, aux->nome, aux->nascimento.dia, aux->nascimento.mes,
-                   aux->nascimento.ano, aux->media);
-        }
+    Aluno *aux;
+    for (aux = first; aux != NULL; aux = aux->next)
+    {
+        printf("%s, %s, %s, %.2f\n", aux->matricula, aux->nome, aux->nascimento.data_nascimento, aux->media);
+    }
 }
 
 void MostrarAlunosReverso(Aluno *first) // NOLINT(misc-no-recursion)
 {
-        if(first == NULL)
-        {
-            return;
-        }
-        MostrarAlunosReverso(first->next);
-        printf("%s, %s, %d/%d/%d, %.2f\n", first->matricula, first->nome, first->nascimento.dia,first->nascimento.mes, first->nascimento.ano, first->media);
+    if(first == NULL)
+    {
+        return;
+    }
+    MostrarAlunosReverso(first->next);
+    printf("%s, %s, %s, %.2f\n", first->matricula, first->nome, first->nascimento.data_nascimento, first->media);
 }
+
+
 Aluno *Inserir(Aluno *atual)
 {
-    int dia, mes, ano;
     float media;
-    char matricula[10], nome[40];
+    char matricula[10], nome[40], data_nasc[15];
     atual = (Aluno * ) malloc(sizeof(Aluno));
-    printf("Matricula:");
     scanf("%s",matricula);
-    printf("Nome:");
     scanf("%s", nome);
-    printf("Data Nascimento:");
-    scanf("%d %d %d",&dia, &mes, &ano);
-    printf("Media:");
+    scanf("%s",data_nasc);
     scanf("%f",&media);
     strcpy(atual->matricula, matricula);
     strcpy(atual->nome, nome);
-    atual->nascimento.dia = dia;
-    atual->nascimento.mes = mes;
-    atual->nascimento.ano = ano;
+    strcpy(atual->nascimento.data_nascimento, data_nasc);
     atual->media = media;
     atual->next = NULL;
     return atual;
@@ -106,18 +98,52 @@ Aluno *Excluir(Aluno *first,  const char *matricula)
     return first;
 }
 
+Aluno *update(Aluno *first, Aluno *aux)
+{
+    if(first != NULL)
+    {
+        aux = first;
+        while(TRUE)
+        {
+            if(aux->next == NULL)
+            {
+                return aux;
+            }
+            aux = aux->next;
+
+        }
+    }
+    return NULL;
+}
+
+int search(Aluno *first, const char matricula[10])
+{
+    Aluno *aux;
+    int contador = 0;
+    for(aux = first; aux !=NULL; aux = aux->next)
+    {
+        if(strcmp(aux->matricula,matricula) == 0)
+        {
+            contador++;
+        }
+    }
+    return contador;
+}
+
+
 void Sair(Aluno *first)
 {
-    printf("Desalocando...\n");
     Aluno *aux = first;
     while(aux != NULL)
     {
         Aluno *next = aux->next;
-        printf("-Matricula:%s\n",aux->matricula);
+        printf("-");
         free(aux);
         aux = next;
     }
 }
+
+
 
 int main()
 {
@@ -125,7 +151,6 @@ int main()
     while(TRUE)
     {
         int opt;
-        printf("(0) Sair\n(1) Adicionar\n(2) Excluir\n(3) Imprimir\n(4) Imprimir Reverso\n(5) Quantidade Elementos\n:");
         scanf("%d", &opt);
         if(opt == 0)
         {
@@ -134,6 +159,7 @@ int main()
         }
         else if(opt == 1)
         {
+
             atual = Inserir(atual);
             if(first == NULL)
             {
@@ -148,10 +174,14 @@ int main()
         }
         else if(opt == 2)
         {if(!ListaVazia(first))
-        {
-            char matricula[10]; scanf("%s",matricula);
-            first = Excluir(first,matricula);
-        }
+            {
+                char matricula[10]; scanf("%s",matricula);
+                for(int i = search(first,matricula); i > 0; i--)
+                {
+                    first = Excluir(first,matricula);
+                    aux = update(first,aux);
+                }
+            }
         }
         else if(opt == 3)
         {
