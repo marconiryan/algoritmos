@@ -5,7 +5,7 @@
 #define FALSE 0
 
 struct data{
-    char data_nascimento[15];
+    int dia, mes, ano;
 };
 typedef struct data Data;
 struct aluno{
@@ -43,7 +43,7 @@ void MostrarAlunos(Aluno *first)
     Aluno *aux;
     for (aux = first; aux != NULL; aux = aux->next)
     {
-        printf("%s, %s, %s, %.2f\n", aux->matricula, aux->nome, aux->nascimento.data_nascimento, aux->media);
+        printf("%s, %s, %d/%d/%d, %.2f\n", aux->matricula, aux->nome, aux->nascimento.dia,aux->nascimento.mes,aux->nascimento.ano, aux->media);
     }
 }
 
@@ -54,22 +54,24 @@ void MostrarAlunosReverso(Aluno *first) // NOLINT(misc-no-recursion)
         return;
     }
     MostrarAlunosReverso(first->next);
-    printf("%s, %s, %s, %.2f\n", first->matricula, first->nome, first->nascimento.data_nascimento, first->media);
+    printf("%s, %s, %d/%d/%d, %.2f\n", first->matricula, first->nome, first->nascimento.dia,first->nascimento.mes,first->nascimento.ano, first->media);
 }
+
 
 
 Aluno *Inserir(Aluno *atual)
 {
+    int dia, mes, ano;
     float media;
-    char matricula[10], nome[40], data_nasc[15];
+    char matricula[10], nome[40];
     atual = (Aluno * ) malloc(sizeof(Aluno));
     scanf("%s",matricula);
     scanf("%s", nome);
-    scanf("%s",data_nasc);
+    scanf("%d/%d/%d",&dia,&mes,&ano);
+    atual->nascimento.dia = dia; atual->nascimento.mes = mes ;atual->nascimento.ano = ano ;
     scanf("%f",&media);
     strcpy(atual->matricula, matricula);
     strcpy(atual->nome, nome);
-    strcpy(atual->nascimento.data_nascimento, data_nasc);
     atual->media = media;
     atual->next = NULL;
     return atual;
@@ -155,6 +157,7 @@ int main()
         if(opt == 0)
         {
             Sair(first);
+            printf("\n");
             break;
         }
         else if(opt == 1)
@@ -199,8 +202,9 @@ int main()
         }
         else if(opt == 5)
         {
-            printf("A lista tem %d elementos\n",QuantosElementos(first));
+            printf("%d\n",QuantosElementos(first));
         }
     }
+    printf("\n");
     return 0;
-}
+    }
