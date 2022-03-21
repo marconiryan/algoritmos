@@ -70,6 +70,7 @@ int main(){
             push(&site, string);
         }
     }
+    printf("\n");
 
     return 0;
 }
