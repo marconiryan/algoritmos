@@ -29,32 +29,28 @@ Product *search_id(LProduct *produto, int id){
     return NULL;
 }
 
-
 void delete_product(LProduct *produto, int code){
     Product *aux = search_id(produto,code);
     if (aux !=NULL){
-        aux->prev->next = aux->next;
-        aux->next->prev = aux->prev;
+        if(aux == produto->head){
+            produto->head = aux->next;
+            if(produto->head){
+                produto->head->prev = NULL;
+            }
+        }
+        else if(aux == produto->last){
+            aux->prev->next = NULL;
+            produto->last = aux->prev;
+        }
+        else{
+            aux->prev->next = aux->next;
+            aux->next->prev = aux->prev;
+        }
         free(aux);
     }
-
 }
 
-void create_product(LProduct *produto){
-    int code,qntd;
-    float price;
-    char name[30];
-    do{
-        printf("CODE:");
-        scanf("%d",&code);
-    } while (search_id(produto,code));
-
-    printf("NAME:");
-    scanf("%s",name);
-    printf("PRICE:");
-    scanf("%f",&price);
-    printf("QUANTIDADE:");
-    scanf("%d",&qntd);
+void create_product(LProduct *produto, int code, int qntd, float price, const char name[30]){
     Product *aux = (Product *) malloc(sizeof(Product));
     aux->next= NULL;
     aux->prev= NULL;
@@ -87,29 +83,85 @@ void print_list(LProduct *produto, Product *unico_print){
     }
 }
 
-void shop(LProduct *produtos){
-    LProduct carrinho;
-    Product *aux;
-    int code_product;
-    init_list(&carrinho);
-    scanf("%d",&code_product);
-    aux = search_id(produtos,code_product);
-    // ToDo
+void shop(LProduct *produtos,LProduct *carrinho,int code, int quantidade){
+    Product *compra_carrinho = search_id(carrinho,code);
+    Product *produto_atual = search_id(produtos,code);
+    if(produto_atual){
+        if (produto_atual->qntd >= quantidade){
+        if(!compra_carrinho){
+            create_product(carrinho,code,quantidade,produto_atual->price * (float)quantidade,produto_atual->name);
+        }
+        else{
+           compra_carrinho->qntd +=  quantidade;
+           compra_carrinho->price += (float) quantidade * produto_atual->price;
+        }
+        produto_atual->qntd = produto_atual->qntd - quantidade;
+    }
+        else{
+            printf("Quantidade insuficiente no estoque!\n");
+        }
+    }
+    else{
+        printf("Produto Não encontrado!\n");
+    }
+}
+
+void tirar_carrinho(LProduct *produtos, LProduct *carrinho, int code){
+    Product *devolver = search_id(carrinho,code);
+    if(devolver){
+        Product *estoque = search_id(produtos,code);
+        estoque->qntd += devolver->qntd;
+        printf("O produto %s foi devolvido ao estoque!\n",estoque->name);
+        delete_product(carrinho,code);
+    }
+}
+
+void limpar(LProduct *lista){
+    Product *aux = lista->head;
+    while (aux != NULL){
+        aux = aux->next;
+        free(lista->head);
+        lista->head = aux;
+
+    }
 }
 
 int main() {
     int opcao;
     LProduct produtos;
+    int code,qntd;
+    float price;
+    char name[30];
     init_list(&produtos);
     while(TRUE){
+        printf("1.Criar\n2.Imprimir\n3.Buscar\n4.Excluir\n5.Comprar\n:");
         scanf("%d",&opcao);
-        if(opcao == -1){break;}
-        else if(opcao == 1){create_product(&produtos);}
-        else if(opcao == 2){print_list(&produtos,NULL);}
+        if(opcao == -1){
+            limpar(&produtos);
+            break;
+        }
+        else if(opcao == 1){
+            do{
+                printf("CODE:");
+                scanf("%d",&code);
+            } while (search_id(&produtos,code));
+
+            printf("NAME:");
+            scanf("%s",name);
+            printf("PRICE:");
+            scanf("%f",&price);
+            printf("QUANTIDADE:");
+            scanf("%d",&qntd);
+            create_product(&produtos,code,qntd,price,name);
+
+        }
+        else if(opcao == 2){
+            print_list(&produtos,NULL);
+        }
         else if(opcao == 3){
             int id; scanf("%d",&id);
             Product *aux = search_id(&produtos,id);
-            if(!aux){
+            if(aux){
                 print_list(&produtos,aux);
             }
         }
@@ -118,8 +170,38 @@ int main() {
             delete_product(&produtos,id);
         }
         else if(opcao == 5){
-           
+            LProduct carrinho;
+            init_list(&carrinho);
+            while(TRUE){
+                printf("----------------------\n");
+                printf("Compras\n");
+                printf("----------------------\n");
+                printf("1.Comprar\n2.Lista de Compras\n3.Lista de Produtos\n4.Devolver\n:");
+                scanf("%d",&opcao);
+                if(opcao == -1){
+                    limpar(&carrinho);
+                    break;
+                }
+                else if(opcao == 1){
+                    printf("Codigo:");
+                    scanf("%d",&code);
+                    printf("Quantidade:");
+                    scanf("%d",&qntd);
+                    shop(&produtos,&carrinho,code,qntd);
+                }
+                else if(opcao == 2){
+                    print_list(&carrinho,NULL);
+                }
+                else if(opcao == 3){
+                    print_list(&produtos,NULL);
+                }
+                else if(opcao == 4){
+                    printf("Codigo:");
+                    scanf("%d",&code);
+                    tirar_carrinho(&produtos,&carrinho,code);
 
+                }
+            }
         }
     }
     return 0;
