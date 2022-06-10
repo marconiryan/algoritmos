@@ -18,7 +18,7 @@ void insertvector(int vector[], int size){
 
 }
 
-int swap(int *x, int *y){
+void swap(int *x, int *y){
     int temp = *x;
     *x = *y;
     *y = temp;
@@ -55,7 +55,7 @@ void comp_pai(int vetor[],int i, int *flag){
 }
 
 
-int heap(int vetor[], int n){
+void heap(int vetor[], int n){
     for(int i = 0; i < n/3; i++){
         comp_pai(vetor,i,&vetor[right(i)]);
         comp_pai(vetor,i,&vetor[left(i)]);
